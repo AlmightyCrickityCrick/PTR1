@@ -12,7 +12,7 @@ defmodule Reader do
   #"event: \"message\"\n\ndata: {\"message\": panic}\n\n"
 
   def handle_info(%HTTPoison.AsyncChunk{chunk: "event: \"message\"\n\ndata: {\"message\": panic}\n\n"}, _state) do
-    send(:Writer1, :kill)
+    send(:LB1, :kill)
     {:noreply, nil}
   end
 
@@ -21,8 +21,9 @@ defmodule Reader do
     try do
       {status, decodedjson} = Poison.decode(message)
       if(status == :ok) do
-        send(:Writer1, decodedjson)
-        send(:Writer2, decodedjson)
+        # send(:Writer1, decodedjson)
+        # send(:Writer2, decodedjson)
+        send(:LB1, decodedjson)
       end
     rescue
       _ ->

@@ -19,10 +19,9 @@ defmodule Writer do
 
   def handle_info(msg, _state) do
     tweet = Map.get(Map.get(msg, "message"), "tweet")
-    _hashtags = Map.get(Map.get(tweet, "entities"), "hashtags")
     Process.sleep(trunc(Statistics.Distributions.Poisson.rand(50)))
     #IO.inspect(Map.get(tweet, "text"))
-    #IO.inspect(hashtags)
+    #send(:LB1, {:finished, self()})
     {:noreply, nil}
   end
 
