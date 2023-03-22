@@ -9,7 +9,7 @@ defmodule WriterSupervisor do
     Process.flag(:trap_exit, true)
     children =
       for i <- 1 .. nr do
-        Supervisor.child_spec({Writer, String.to_atom("Writer#{i}")}, id: String.to_atom("writer#{i}"), restart: :permanent)
+        Supervisor.child_spec({Writer, String.to_atom("writer#{i}")}, id: String.to_atom("writer#{i}"), restart: :permanent)
       end
 
     Supervisor.init(children, [strategy: :one_for_one, max_restarts: 200])

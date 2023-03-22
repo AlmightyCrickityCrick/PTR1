@@ -21,7 +21,8 @@ defmodule Writer do
     tweet = Map.get(Map.get(msg, "message"), "tweet")
     Process.sleep(trunc(Statistics.Distributions.Poisson.rand(50)))
     #IO.inspect(Map.get(tweet, "text"))
-    #send(:LB1, {:finished, self()})
+    IO.inspect(self())
+    send(:LB1, {:finished, self()})
     {:noreply, nil}
   end
 

@@ -23,6 +23,7 @@ defmodule LoadBalancer do
         List.insert_at(acc, -1, {x, y} )
       end
     end)
+    IO.inspect(new_list)
     {:noreply, %{nr: state[:nr], current: state[:current], writers: new_list}}
   end
 

@@ -19,12 +19,7 @@ defmodule Reader do
   def handle_info(%HTTPoison.AsyncChunk{chunk: chunk}, _state) do
     "event: \"message\"\n\ndata: " <> message = chunk
     try do
-      {status, decodedjson} = Poison.decode(message)
-      if(status == :ok) do
-        # send(:Writer1, decodedjson)
-        # send(:Writer2, decodedjson)
-        send(:LB1, decodedjson)
-      end
+        send(:LB1, message)
     rescue
       _ ->
         IO.inspect(message)
