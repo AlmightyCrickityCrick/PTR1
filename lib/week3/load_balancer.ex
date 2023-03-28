@@ -68,7 +68,7 @@ defmodule LoadBalancer3 do
       true ->
         writers
     end
-
+    IO.inspect(writer_list)
     :timer.send_after(3000, self(), :balance)
 
     {:noreply,  %{nr: length(writer_list), current: state[:current], writers: writer_list}}
@@ -95,8 +95,8 @@ defmodule LoadBalancer3 do
           id =  x|> elem(0)
           nr = x |> elem(1)
         if(i < 3) do
-          pid = WriterSupervisor3.get_process(String.to_integer(String.replace(Atom.to_string(id), "writer", "")))
-          send(pid, hashed_msg)
+          # pid = WriterSupervisor3.get_process(String.to_integer(String.replace(Atom.to_string(id), "writer", "")))
+          GenServer.cast(id, hashed_msg)
           {id, nr + 1}
         else
           {id, nr}

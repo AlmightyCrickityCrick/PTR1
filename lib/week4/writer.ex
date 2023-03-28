@@ -1,4 +1,4 @@
-defmodule Writer3 do
+defmodule Writer4 do
   use GenServer
 
   def start_link(args) do
@@ -12,36 +12,18 @@ defmodule Writer3 do
     {:ok, nil}
   end
 
-  def handle_info(:kill, _state) do
-    IO.puts("Murder")
-    send(:LB1, {:reset, self()})
-    exit(:kill)
-
-  end
-
   def handle_info(_msg, _state) do
     {:noreply, nil}
   end
 
-  def handle_cast(hash, _state) do
-    sem =:ets.lookup(:app, :semaphore)
-    semaph = if (length(sem)!=0) do
-      {_ , value} = List.first(sem)
-      value
-    end
+  def handle_cast(:kill, _state) do
+    IO.puts("Murder")
+    exit(:kill)
+  end
 
-    _ = Semaphore.acquire(semaph)
-    m = :ets.lookup(:messages, hash)
-    msg = if (length(m)!=0) do
-      {_ , value} = List.first(m)
-      value
-    else
-      nil
-    end
-    if(msg != nil)do
-      _ = :ets.delete(:messages, hash)
-      Semaphore.release(semaph)
-      tweet = Map.get(Map.get(Map.get(msg, "message"), "tweet"), "text")
+  def handle_cast(msg, _state) do
+      m = Map.get(msg, :msg)
+      tweet = Map.get(Map.get(Map.get(m, "message"), "tweet"), "text")
       swears = :ets.lookup(:app, :swear_list)
       swears = if (length(swears)!=0) do
       {_ , value} = List.first(swears)
@@ -56,10 +38,6 @@ defmodule Writer3 do
       |> Enum.join(" ")
     Process.sleep(trunc(Statistics.Distributions.Poisson.rand(5)))
     if(String.contains?(censored_tweet, "*")) do IO.inspect(censored_tweet) end
-      else
-      Semaphore.release(semaph)
-  end
-    send(:LB1, {:finished, self()})
     {:noreply, nil}
   end
 
