@@ -8,9 +8,12 @@ defmodule PoolSupervisor4 do
 
   def init(nr) do
     Process.flag(:trap_exit, true)
-    children = for i <- 0 .. nr-1 do
-      Supervisor.child_spec({WriterSupervisor4, i}, id: String.to_atom("ws#{i}"), restart: :permanent)
-      end
+    children = [
+      Supervisor.child_spec({WriterSupervisor4, %{nr: nr, type: :emo, id: 0}}, id: String.to_atom("ws#{0}"), restart: :permanent),
+      Supervisor.child_spec({WriterSupervisor4, %{nr: nr, type: :eng, id: 1}}, id: String.to_atom("ws#{1}"), restart: :permanent),
+      Supervisor.child_spec({WriterSupervisor4, %{nr: nr, type: :user_eng, id: 2}}, id: String.to_atom("ws#{2}"), restart: :permanent),
+      Supervisor.child_spec({WriterSupervisor4, %{nr: nr, type: :simple, id: 3}}, id: String.to_atom("ws#{3}"), restart: :permanent),
+    ]
 
     Supervisor.init(children, [strategy: :one_for_one, max_restarts: 200])
     #DynamicSupervisor.init(strategy:  :one_for_one, max_restarts: 2000)

@@ -1,20 +1,28 @@
 defmodule WriterSupervisor4 do
   use Supervisor
 
-  def start_link(nr) do
-    Supervisor.start_link(__MODULE__, nr, name: String.to_atom("writersup#{nr}"))
+  def start_link(args) do
+    Supervisor.start_link(__MODULE__, args, name: String.to_atom("writersup#{Map.get(args, :id)}"))
     # DynamicSupervisor.start_link(__MODULE__,[], name: __MODULE__)
   end
 
-  def init(nr) do
+  def init(args) do
     Process.flag(:trap_exit, true)
-    children =[
-         Supervisor.child_spec({Writer4, String.to_atom("simplewriter#{nr}")}, id: String.to_atom("simplewriter#{nr}"), restart: :permanent),
-         Supervisor.child_spec({EmotionWriter4, String.to_atom("emowriter#{nr}")}, id: String.to_atom("emowriter#{nr}"), restart: :permanent),
-         Supervisor.child_spec({EngagementWriter4, String.to_atom("engwriter#{nr}")}, id: String.to_atom("engwriter#{nr}"), restart: :permanent),
-         Supervisor.child_spec({UserEngagementWriter4, String.to_atom("userengwriter#{nr}")}, id: String.to_atom("userengwriter#{nr}"), restart: :permanent),
+    nr = Map.get(args, :nr)
+    type = Map.get(args, :type)
+    children = for i <- 0 .. nr - 1 do
+      cond do
+        type == :emo ->
+          Supervisor.child_spec({EmotionWriter4, String.to_atom("emowriter#{i}")}, id: String.to_atom("emowriter#{i}"), restart: :permanent)
+        type == :eng ->
+          Supervisor.child_spec({EngagementWriter4, String.to_atom("engwriter#{i}")}, id: String.to_atom("engwriter#{i}"), restart: :permanent)
+        type == :user_eng ->
+          Supervisor.child_spec({UserEngagementWriter4, String.to_atom("userengwriter#{i}")}, id: String.to_atom("userengwriter#{i}"), restart: :permanent)
+        true ->
+          Supervisor.child_spec({Writer4, String.to_atom("simplewriter#{i}")}, id: String.to_atom("simplewriter#{i}"), restart: :permanent)
+      end
+    end
 
-    ]
     #   for i <- 1 .. nr do
     #     Supervisor.child_spec({Writer, String.to_atom("Writer#{i}")}, id: String.to_atom("writer#{i}"), restart: :permanent)
     #   end
