@@ -15,7 +15,7 @@ defmodule Project1.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {TwitterApplication4, []}
+      mod: {TwitterApplication5, []}
     ]
   end
 
