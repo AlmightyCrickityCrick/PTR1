@@ -9,7 +9,20 @@ defmodule Aggregator5 do
     {:ok, %{}}
   end
 
-  #Did I have to have 3 functions for this? Absolutely not
+  def handle_cast({:gimme, nr}, state) do
+    twt = Map.filter(state, fn{_key, val} -> Map.get(val, :state) == :done end)
+    id_list = Map.keys(twt)
+    to_send_list = for x <- 0 .. nr - 1 do
+      Enum.at(id_list, x)
+    end
+    to_send_list = Enum.filter(to_send_list, fn i -> i != nil end)
+    new_state = Map.filter(state, fn{key, _val} -> !Enum.member?(to_send_list, key) end)
+    for x <- to_send_list do
+      t = Map.get(twt, x)
+      GenServer.cast(Batcher5, t)
+    end
+    {:noreply, new_state}
+  end
 
   def handle_cast(%{type: type, id: id, info: info}, state) do
     new_state = if(Map.has_key?(state, id)) do
@@ -17,8 +30,8 @@ defmodule Aggregator5 do
       if(Enum.count(twt)< 3) do
         Map.put(state, id, twt)
       else
-        GenServer.cast(Batcher5, twt)
-        Map.delete(state, id)
+        t = Map.put(twt, :state, :done)
+        Map.put(state, id, t)
       end
     else
       Map.put(state, id, %{type => info})
