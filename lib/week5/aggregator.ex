@@ -10,6 +10,7 @@ defmodule Aggregator5 do
   end
 
   def handle_cast({:gimme, nr}, state) do
+    IO.puts("Gimme received")
     twt = Map.filter(state, fn{_key, val} -> Map.get(val, :state) == :done end)
     id_list = Map.keys(twt)
     to_send_list = for x <- 0 .. nr - 1 do

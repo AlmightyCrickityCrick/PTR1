@@ -13,7 +13,7 @@ defmodule TweetSupervisor5 do
       Supervisor.child_spec({Reader5, ["http://localhost:4000/tweets/1"]}, id: :reader1),
       Supervisor.child_spec({Reader5, ["http://localhost:4000/tweets/2"]}, id: :reader2),
       Supervisor.child_spec({Aggregator5, []}, id: :aggregator),
-      Supervisor.child_spec({Batcher5, 5}, id: :batcher)
+      Supervisor.child_spec({Batcher5, 3}, id: :batcher)
     ]
     Supervisor.init(children, [strategy: :one_for_one, max_restarts: 200])
   end
