@@ -29,20 +29,20 @@ defmodule EngagementWriter5 do
     followers = Map.get(m, "user") |> Map.get("followers_count")
     user = Map.get(m, "user") |> Map.get("id")
     engagement = if(followers != 0) do(favorites + retweets)/followers else 0 end
-    _res = add_engagement(user, engagement)
+    _res = add_engagement(user, Map.get(msg, :hash), engagement)
     #IO.inspect({Map.get(msg, :hash), "engagement", engagement})
     GenServer.cast(Aggregator5, %{type: :eng, id: Map.get(msg, :hash), info: engagement})
     Process.sleep(trunc(Statistics.Distributions.Poisson.rand(5)))
     {:noreply, nil}
   end
 
-  def add_engagement(user, engagement) do
+  def add_engagement(user, id, engagement) do
   usr = :ets.lookup(:users, user)
   _usr = if (length(usr)!=0) do
     {_ , value} = List.first(usr)
-    :ets.insert(:users, {user, List.insert_at(value, -1, engagement)})
+    :ets.insert(:users, {user, List.insert_at(value, -1, %{id => engagement})})
   else
-    :ets.insert(:users, {user, [engagement]})
+    :ets.insert(:users, {user, [%{id => engagement}]})
   end
   :ok
 

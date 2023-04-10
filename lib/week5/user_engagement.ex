@@ -29,7 +29,7 @@ defmodule UserEngagementWriter5 do
     engagement = :ets.lookup(:users, user)
     engagement = if (length(engagement)!=0) do
       {_ , value} = List.first(engagement)
-      Enum.sum(value) / length(value)
+      Enum.sum(Map.values(value)) / Enum.count(value)
     else
       0
     end

@@ -14,8 +14,8 @@ defmodule Batcher5 do
   def handle_cast(info, state) do
     new_tweets = Map.get(state, :tweets) |> List.insert_at(-1, info)
     twt = if(length(new_tweets) >= Map.get(state, :size)) do
-      IO.puts("Full")
-      IO.inspect(new_tweets)
+      #IO.puts("Full")
+      #IO.inspect(new_tweets)
       GenServer.cast(Aggregator5, {:gimme, Map.get(state, :size)})
       :timer.cancel(Map.get(state, :timer))
       []
@@ -28,7 +28,7 @@ defmodule Batcher5 do
 
   def handle_info(:print, state) do
     {t, e} = if((:os.system_time(:millisecond) - Map.get(state, :last_time) ) > 5000) do
-      IO.puts("Timed")
+      #IO.puts("Timed")
       IO.inspect(Map.get(state, :tweets))
       GenServer.cast(Aggregator5, {:gimme, Map.get(state, :size)})
       {[], :os.system_time(:millisecond)}
