@@ -13,6 +13,7 @@ defmodule TwitterApplication5 do
     :ets.new(:app, [:named_table, :set, :public])
     :ets.insert(:app, {:swear_list, swear_list})
     :ets.new(:users, [:named_table, :set, :public])
+    :ets.new(:tweets, [:named_table, :set, :public])
 
     {_resp, pid}= TweetSupervisor5.start_link(%{nr: 3})
   end

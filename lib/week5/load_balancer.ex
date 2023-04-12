@@ -90,7 +90,6 @@ defmodule LoadBalancer5 do
       GenServer.cast(String.to_atom("simplewriter#{id}"), %{hash: hashed_msg, msg: decodedjson})
       GenServer.cast(String.to_atom("emowriter#{id}"), %{hash: hashed_msg, msg: decodedjson})
       GenServer.cast(String.to_atom("engwriter#{id}"), %{hash: hashed_msg, msg: decodedjson})
-      GenServer.cast(String.to_atom("userengwriter#{id}"), %{hash: hashed_msg, msg: decodedjson})
 
       if(decodedjson["retweeted_status"] != nil)do
         inner_twt = decodedjson["retweeted_status"]
@@ -98,7 +97,6 @@ defmodule LoadBalancer5 do
         GenServer.cast(String.to_atom("simplewriter#{id}"), %{hash: inner_hash, msg: inner_twt})
         GenServer.cast(String.to_atom("emowriter#{id}"),  %{hash: inner_hash, msg: inner_twt})
         GenServer.cast(String.to_atom("engwriter#{id}"),  %{hash: inner_hash, msg: inner_twt})
-        GenServer.cast(String.to_atom("userengwriter#{id}"),  %{hash: inner_hash, msg: inner_twt})
       end
 
       {:noreply,  %{nr: state[:nr], current: next, writers: state[:writers]}}

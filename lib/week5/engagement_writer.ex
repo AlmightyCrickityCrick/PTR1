@@ -3,13 +3,13 @@ defmodule EngagementWriter5 do
 
   def start_link(args) do
     IO.puts("#{args} starting")
-    GenServer.start_link(__MODULE__, [], name: args)
+    GenServer.start_link(__MODULE__, %{name: args}, name: args)
   end
 
 
-  def init(_args) do
+  def init(args) do
     Process.flag(:trap_exit, true)
-    {:ok, nil}
+    {:ok, args}
   end
 
   def handle_info(:kill, _state) do
@@ -18,11 +18,11 @@ defmodule EngagementWriter5 do
 
   end
 
-  def handle_info(_msg, _state) do
-    {:noreply, nil}
+  def handle_info(_msg, state) do
+    {:noreply, state}
   end
 
-  def handle_cast(msg, _state) do
+  def handle_cast(msg, state) do
     m = Map.get(msg, :msg)
     favorites = Map.get(m, "favorite_count")
     retweets = Map.get(m, "retweet_count")
@@ -32,8 +32,9 @@ defmodule EngagementWriter5 do
     _res = add_engagement(user, Map.get(msg, :hash), engagement)
     #IO.inspect({Map.get(msg, :hash), "engagement", engagement})
     GenServer.cast(Aggregator5, %{type: :eng, id: Map.get(msg, :hash), info: engagement})
+    GenServer.cast(String.to_atom("userengwriter#{String.replace(Atom.to_string(Map.get(state, :name)), "engwriter", "")}"), %{hash: Map.get(msg, :hash), msg: Map.get(msg, :msg)})
     Process.sleep(trunc(Statistics.Distributions.Poisson.rand(5)))
-    {:noreply, nil}
+    {:noreply, state}
   end
 
   def add_engagement(user, id, engagement) do

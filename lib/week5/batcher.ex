@@ -16,9 +16,16 @@ defmodule Batcher5 do
     twt = if(length(new_tweets) >= Map.get(state, :size)) do
       #IO.puts("Full")
       #IO.inspect(new_tweets)
-      GenServer.cast(Aggregator5, {:gimme, Map.get(state, :size)})
-      :timer.cancel(Map.get(state, :timer))
-      []
+      try do
+        send(DBWriter5, new_tweets)
+        GenServer.cast(Aggregator5, {:gimme, Map.get(state, :size)})
+        :timer.cancel(Map.get(state, :timer))
+        []
+      rescue
+        _ ->
+          IO.puts("No answer from DB")
+          new_tweets
+        end
     else
       new_tweets
     end
@@ -29,9 +36,15 @@ defmodule Batcher5 do
   def handle_info(:print, state) do
     {t, e} = if((:os.system_time(:millisecond) - Map.get(state, :last_time) ) > 5000) do
       #IO.puts("Timed")
-      IO.inspect(Map.get(state, :tweets))
+      try do
+      send(DBWriter5, Map.get(state, :tweets))
       GenServer.cast(Aggregator5, {:gimme, Map.get(state, :size)})
       {[], :os.system_time(:millisecond)}
+      rescue
+        _ ->
+          IO.puts("No answer from DB")
+          {Map.get(state, :tweets),  Map.get(state, :last_time)}
+      end
     else
       {Map.get(state, :tweets),  Map.get(state, :last_time)}
     end

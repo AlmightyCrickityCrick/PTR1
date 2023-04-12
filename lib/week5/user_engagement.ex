@@ -27,12 +27,16 @@ defmodule UserEngagementWriter5 do
     m = Map.get(msg, :msg)
     user = Map.get(m, "user") |> Map.get("id")
     engagement = :ets.lookup(:users, user)
-    engagement = if (length(engagement)!=0) do
+    {engagement, l} = if (length(engagement)!=0) do
       {_ , value} = List.first(engagement)
-      Enum.sum(Map.values(value)) / Enum.count(value)
+      s = for v <- value do
+        List.first(Map.values(v))
+      end
+      {Enum.sum(s), length(value)}
     else
-      0
+      {0, 1}
     end
+    engagement =engagement / l
    #IO.inspect({user, "user_engagement", engagement})
    Process.sleep(trunc(Statistics.Distributions.Poisson.rand(5)))
     {:noreply, nil}
