@@ -10,11 +10,15 @@ defmodule TweetSupervisor5 do
     children = [
       Supervisor.child_spec({PoolSupervisor5, args}, id: String.to_atom("ps"), restart: :permanent),
       Supervisor.child_spec({LoadBalancer5, %{:name => :LB1, :nr => args }}, id: :lb, restart: :permanent),
-      Supervisor.child_spec({Reader5, ["http://localhost:4000/tweets/1"]}, id: :reader1),
-      Supervisor.child_spec({Reader5, ["http://localhost:4000/tweets/2"]}, id: :reader2),
+      Supervisor.child_spec({Reader5, ["http://tweeter:4000/tweets/1"]}, id: :reader1),
+      Supervisor.child_spec({Reader5, ["http://tweeter:4000/tweets/2"]}, id: :reader2),
       Supervisor.child_spec({Aggregator5, []}, id: :aggregator),
       Supervisor.child_spec({Batcher5, 3}, id: :batcher),
-      Supervisor.child_spec({DBWriter5, []}, id: :db_writer)
+      Supervisor.child_spec({DBWriter5, []}, id: :db_writer),
+      Supervisor.child_spec({Project1Client, []}, id: :client),
+      Supervisor.child_spec({CdcAdapter, []}, id: :project1)
+
+
     ]
     Supervisor.init(children, [strategy: :one_for_one, max_restarts: 200])
   end

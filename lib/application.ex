@@ -2,9 +2,9 @@ defmodule TwitterApplication5 do
   use Application
 
   def start(_type, _args) do
-    json = File.read!("lib/week3/swearwords.json")
+    json = File.read!("lib/swearwords.json")
     :ets.new(:emotion, [:named_table, :set, :public])
-    emotion_list = HTTPoison.get!("http://localhost:4000/emotion_values").body |> String.replace("\t", ":")|> String.replace("\r\n", ", ")|> String.split(", ")
+    emotion_list = HTTPoison.get!("http://tweeter:4000/emotion_values").body |> String.replace("\t", ":")|> String.replace("\r\n", ", ")|> String.split(", ")
     for x <- emotion_list do
       [word | val] = String.split(x, ":")
       :ets.insert(:emotion, {word, Enum.at(val, 0)})
